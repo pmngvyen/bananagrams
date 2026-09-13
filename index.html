@@ -171,40 +171,41 @@ ul.seats .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hud li .n{font-family:var(--slab);font-size:14px}
 .hud li.clear .n{color:var(--rust)}
 
-/* ---------- your tray: hand, tools, dump, status ---------- */
-.tray{position:absolute;right:14px;top:14px;z-index:8;width:296px;
-  background:var(--panel);border:2px solid var(--edge2);border-radius:5px;overflow:hidden}
-.trayhead{background:var(--yellow);border-bottom:2px solid var(--edge2);
-  padding:5px 6px 5px 11px;display:flex;align-items:center;gap:6px}
-.trayhead .ttl{flex:1;font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.62}
-.tools{display:flex;gap:3px}
-.icon{width:26px;height:26px;padding:0;display:grid;place-items:center;font-size:13px;
-  border-width:1.5px;border-radius:3px}
-.icon:hover:not(:disabled){background:rgba(107,86,54,.18)}
-#rack{display:flex;flex-wrap:wrap;gap:5px;padding:10px;min-height:58px;align-content:flex-start}
-#rack .tile{width:38px;height:38px;font-size:19px;cursor:grab}
+/* ---------- your tray: one row of tiles, tools, dump ---------- */
+.tray{flex:0 0 auto;display:flex;align-items:center;gap:10px;
+  background:var(--panel);border-bottom:3px solid var(--edge2);padding:8px 12px}
+#rack{flex:1;min-width:0;display:flex;flex-wrap:nowrap;gap:5px;align-items:center;
+  overflow-x:auto;overflow-y:hidden;min-height:42px;padding-bottom:2px;
+  scrollbar-width:thin;scrollbar-color:var(--edge) transparent}
+#rack::-webkit-scrollbar{height:7px}
+#rack::-webkit-scrollbar-thumb{background:var(--edge);border-radius:4px}
+#rack .tile{width:38px;height:38px;font-size:19px;flex:0 0 auto;cursor:grab}
 #rack .tile.picked{background:var(--yellow);border-color:var(--gold)}
 #rack .tile.lifted{opacity:.28}
-#rack .empty{color:var(--dimmer);font-size:12.5px;font-weight:600;align-self:center;padding:6px}
+#rack .empty{color:var(--dimmer);font-size:12.5px;font-weight:600;white-space:nowrap}
+.tools{display:flex;gap:4px;flex:0 0 auto}
+.icon{width:30px;height:30px;padding:0;display:grid;place-items:center;font-size:14px;
+  border-width:1.5px;border-radius:3px}
+.icon:hover:not(:disabled){background:rgba(107,86,54,.14)}
 
-.note{padding:7px 11px;font-size:12px;font-weight:600;line-height:1.35;
-  border-top:2px solid var(--edge2);background:#FFF7DE}
-.note.warn{background:#FAE6E0;color:var(--rust)}
-
-.pouch{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
-  padding:9px 11px;background:#4E3D24;border:0;border-top:2px solid var(--edge2);border-radius:0}
-.pouch svg{width:26px;height:26px;flex:0 0 auto;display:block}
-.pouch .lbl{font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#C7B48C}
+.pouch{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:7px 13px 7px 10px;
+  background:#4E3D24;border:2px solid var(--edge2);border-radius:4px}
+.pouch svg{width:26px;height:26px;display:block}
+.pouch .lbl{font-family:var(--slab);font-size:14px;letter-spacing:.04em;color:var(--yellow)}
 .pouch.live{background:var(--yellow)}
 .pouch.live svg path{fill:var(--ink)}
 .pouch.live svg path+path{fill:#6B5636}
 .pouch.live .lbl{color:var(--ink)}
-.pouch.cold{opacity:.5}
+.pouch.cold{opacity:.45}
+
+.note{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:8;
+  background:var(--panel);border:2px solid var(--edge2);border-radius:4px;
+  padding:7px 14px;font-size:13px;font-weight:600;white-space:nowrap;
+  max-width:calc(100% - 60px);overflow:hidden;text-overflow:ellipsis}
+.note.warn{border-color:var(--rust);color:var(--rust)}
 
 #ghost{position:fixed;z-index:80;pointer-events:none;width:38px;height:38px;font-size:19px;
-  transform:translate(-50%,-50%) rotate(-5deg);transition:width .07s,height .07s,font-size .07s}
-#ghost.snap{width:var(--cell);height:var(--cell);font-size:calc(var(--cell) * .5);
-  transform:translate(-50%,-50%) rotate(0deg)}
+  transform:translate(-50%,-50%) rotate(-5deg)}
 
 /* ---------- the one piece of motion ---------- */
 #stamp{position:fixed;inset:0;display:grid;place-items:center;z-index:75;pointer-events:none}
@@ -255,11 +256,16 @@ ul.seats .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .wordmark svg{width:22px;height:22px}
   .hud{left:9px;top:9px;width:132px}
   .hud .top b{font-size:18px}
-  .hud ul{max-height:20vh}
-  .tray{right:8px;left:8px;top:auto;bottom:8px;width:auto}
-  #rack{justify-content:center;padding:8px;min-height:50px}
+  .hud ul{max-height:22vh}
+  .tray{gap:7px;padding:7px 9px}
   #rack .tile{width:34px;height:34px;font-size:17px}
   #ghost{width:34px;height:34px;font-size:17px}
+  .pouch{padding:6px 10px 6px 8px}
+  .pouch svg{width:22px;height:22px}
+  .pouch .lbl{font-size:12px}
+  .tools{gap:3px}
+  .icon{width:27px;height:27px;font-size:13px}
+  .note{bottom:10px;font-size:12px;padding:6px 10px}
   .card{padding:20px}
 }
 </style>
@@ -345,6 +351,24 @@ ul.seats .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   </section>
 
   <!-- ================= play ================= -->
+  <div class="tray hide" id="tray">
+    <div id="rack"></div>
+    <div class="tools">
+      <button class="btn icon" id="shuffleBtn" title="Shuffle" aria-label="Shuffle your tiles">&#8646;</button>
+      <button class="btn icon" id="recallBtn" title="Take every tile back" aria-label="Take every tile back">&#8634;</button>
+      <button class="btn icon" id="zoomOut" title="Zoom out" aria-label="Zoom out">&minus;</button>
+      <button class="btn icon" id="zoomIn" title="Zoom in" aria-label="Zoom in">+</button>
+      <button class="btn icon" id="soundBtn" title="Sound" aria-label="Toggle sound">&#9834;</button>
+    </div>
+    <button class="pouch" id="pouch" title="Drop a tile here to swap it for three">
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M8 6c-2 0-3 1.3-2.7 3 .4 2.3 1.3 4.1 1.3 6.9C6.6 25.5 14 33.5 24 33.5c5.6 0 10-2.2 12.2-5.1 1-1.2.2-2.6-1.2-2.4-7.8.7-13.7-1.9-17.5-6.6-3.2-4-4.2-7.7-4.8-11.1C12.4 6.6 11.1 6 8 6Z" fill="#FFC72C"/>
+        <path d="M24 33.5c5.6 0 10-2.2 12.2-5.1 1-1.2.2-2.6-1.2-2.4-1.6.2-3.1.2-4.5 0-1.4 3.8-4.5 6.5-8.8 7.4.8.1 1.6.1 2.3.1Z" fill="#C89200"/>
+      </svg>
+      <span class="lbl">Dump</span>
+    </button>
+  </div>
+
   <main class="play hide" id="v-play">
     <div class="boardwrap" id="boardwrap">
       <div id="board"><div id="marquee" class="hide"></div></div>
@@ -355,27 +379,7 @@ ul.seats .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       <ul id="tally"></ul>
     </div>
 
-    <div class="tray" id="tray">
-      <div class="trayhead">
-        <span class="ttl">Your tiles</span>
-        <div class="tools">
-          <button class="btn icon" id="shuffleBtn" title="Shuffle" aria-label="Shuffle your tiles">&#8646;</button>
-          <button class="btn icon" id="recallBtn" title="Take every tile back" aria-label="Take every tile back">&#8634;</button>
-          <button class="btn icon" id="zoomOut" title="Zoom out" aria-label="Zoom out">&minus;</button>
-          <button class="btn icon" id="zoomIn" title="Zoom in" aria-label="Zoom in">+</button>
-          <button class="btn icon" id="soundBtn" title="Sound" aria-label="Toggle sound">&#9834;</button>
-        </div>
-      </div>
-      <div id="rack"></div>
-      <div class="note hide" id="note"></div>
-      <button class="pouch" id="pouch" title="Drop a tile here to swap it for three">
-        <svg viewBox="0 0 40 40" aria-hidden="true">
-          <path d="M8 6c-2 0-3 1.3-2.7 3 .4 2.3 1.3 4.1 1.3 6.9C6.6 25.5 14 33.5 24 33.5c5.6 0 10-2.2 12.2-5.1 1-1.2.2-2.6-1.2-2.4-7.8.7-13.7-1.9-17.5-6.6-3.2-4-4.2-7.7-4.8-11.1C12.4 6.6 11.1 6 8 6Z" fill="#FFC72C"/>
-          <path d="M24 33.5c5.6 0 10-2.2 12.2-5.1 1-1.2.2-2.6-1.2-2.4-1.6.2-3.1.2-4.5 0-1.4 3.8-4.5 6.5-8.8 7.4.8.1 1.6.1 2.3.1Z" fill="#C89200"/>
-        </svg>
-        <span class="lbl">Drop a tile to swap it for three</span>
-      </button>
-    </div>
+    <div class="note hide" id="note"></div>
 
   </main>
 
@@ -396,10 +400,10 @@ ul.seats .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     </ul>
     <h3>Controls</h3>
     <ul class="rules">
-      <li><span class="k key">Click</span><span>Click a square to put the cursor there. Click again to switch between typing across and down.</span></li>
-      <li><span class="k key">A&ndash;Z</span><span>Type to place a tile from your hand. Typing over a letter you already placed steps past it.</span></li>
-      <li><span class="k key">&#9003;</span><span>Backspace takes a tile back. Arrows move the cursor, space flips its direction.</span></li>
-      <li><span class="k key">Drag</span><span>Drag across empty squares to lasso a word, then drag the group to move it in one piece. Arrows nudge a lassoed group.</span></li>
+      <li><span class="k key">Drag</span><span>Drag a tile from the row at the top onto the board. Let go anywhere and it lands square in a cell.</span></li>
+      <li><span class="k key">Lasso</span><span>Drag across empty squares to lasso a word, then drag the group to move it in one piece. Arrow keys nudge a lassoed group.</span></li>
+      <li><span class="k key">A&ndash;Z</span><span>Optional, and much quicker: click a square and start typing. A marker appears and letters drop in as you go. Backspace takes one back, space switches between across and down, escape puts it away again.</span></li>
+      <li><span class="k key">Dump</span><span>Drag any tile onto Dump, top right, to swap it for three.</span></li>
     </ul>
     <p style="margin:18px 0 0;font-size:13px">Words are checked against ENABLE, the public&#8209;domain lexicon behind most word games &mdash; <span id="dictSize">0</span> entries, including every two&#8209;letter word.</p>
     <button class="btn go full" id="helpClose" style="margin-top:18px">Got it</button>
@@ -169209,6 +169213,7 @@ let cells = [], sigs = [], drag = null;
 let zoom = 38, soundOn = true, view = "", audio = null;
 let myPeels = 0, myDumps = 0, mode = "full";
 let dealt = false, lastN = 0, peelTimer = null, flash = {}, starting = false, dropCell = null;
+let typing = false;   /* the keyboard cursor stays out of sight until you actually type */
 
 const K = (x, y) => x + "," + y;
 const parseK = k => k.split(",").map(Number);
@@ -169363,7 +169368,7 @@ function paint(){
 
   for (let i = 0; i < cells.length; i++){
     const el = cells[i], k = el.dataset.k, t = grid.get(k);
-    const cur = !t && k === ck, curT = t && k === ck;
+    const cur = typing && !t && k === ck, curT = typing && t && k === ck;
     const g = an.good.has(k), off = an.loose.has(k), s = sel.has(k);
     const sig = (t ? t.l + t.id : "-") + (cur || curT ? "c" + cursor.dir : "") +
                 (g ? "g" : "") + (off ? "o" : "") + (s ? "s" : "");
@@ -169418,6 +169423,7 @@ function paintNote(an){
 function show(v){
   view = v;
   ["v-config", "v-home", "v-lobby", "v-play"].forEach(id => $(id).classList.toggle("hide", id !== "v-" + v));
+  $("tray").classList.toggle("hide", v !== "play");
   $("roomTag").classList.toggle("hide", !code);
   $("leaveBtn").classList.toggle("hide", !code);
   if (v === "play") requestAnimationFrame(() => { sigs.fill(""); paint(); });
@@ -169725,6 +169731,12 @@ async function doPeel(){
 async function doDump(t){
   if (busy || !playing() || !t) return;
   busy = true;
+  /* let go of it straight away — waiting on the server made it look stuck */
+  const wasAt = [];
+  hand = hand.filter(x => x.id !== t.id);
+  for (const k of Array.from(grid.keys())) if (grid.get(k).id === t.id){ grid.delete(k); wasAt.push(k); }
+  sigs.fill("");
+  paint();
   try {
     let take = null;
     await runTransaction(R.pool, cur => {
@@ -169736,17 +169748,21 @@ async function doDump(t){
       return r.pool;
     });
     if (take){
-      hand = hand.filter(x => x.id !== t.id);
-      for (const k of grid.keys()) if (grid.get(k).id === t.id) grid.delete(k);
       for (const ch of take) hand.push(tile(ch));
       sortHand();
       myDumps++;
-      sigs.fill("");
       syncNow();
       blip(260, .1);
+    } else {
+      if (wasAt.length) grid.set(wasAt[0], t); else toHand(t);
+      const el = $("note");
+      el.className = "note warn";
+      el.textContent = "Not enough tiles left to dump";
+      setTimeout(() => paint(), 2200);
     }
   } finally {
     busy = false;
+    sigs.fill("");
     paint();
   }
 }
@@ -169851,6 +169867,7 @@ function overPouch(x, y){
 }
 
 function beginDrag(e, src, t, fromK, cellK){
+  if (typing){ typing = false; sigs.fill(""); }
   drag = { src, tile: t, fromK, cellK, x0: e.clientX, y0: e.clientY,
            on: false, group: false, band: false, g: geom() };
   window.addEventListener("pointermove", onMove);
@@ -169894,17 +169911,9 @@ function onMove(e){
   const c = over ? null : cellUnder(e.clientX, e.clientY);
   if (dropCell && dropCell !== c) dropCell.classList.remove("drop");
   dropCell = c;
-  if (c){
-    c.classList.add("drop");
-    const r = c.getBoundingClientRect();
-    ghost.style.left = (r.left + r.width / 2) + "px";
-    ghost.style.top = (r.top + r.height / 2) + "px";
-    ghost.classList.add("snap");
-  } else {
-    ghost.style.left = e.clientX + "px";
-    ghost.style.top = e.clientY + "px";
-    ghost.classList.remove("snap");
-  }
+  if (c) c.classList.add("drop");
+  ghost.style.left = e.clientX + "px";
+  ghost.style.top = e.clientY + "px";
 }
 
 function startCarry(){
@@ -169938,7 +169947,6 @@ function onUp(e){
   const d = drag;
   drag = null;
   ghost.hidden = true;
-  ghost.classList.remove("snap");
   marquee.classList.add("hide");
   pouch.classList.remove("live");
   if (dropCell){ dropCell.classList.remove("drop"); dropCell = null; }
@@ -169982,7 +169990,7 @@ function tap(d){
     if (t){ dropOn(k, t, null); picked = null; return; }
   }
   const [x, y] = parseK(k);
-  if (cursor.x === x && cursor.y === y) cursor.dir = cursor.dir === "a" ? "d" : "a";
+  if (typing && cursor.x === x && cursor.y === y) cursor.dir = cursor.dir === "a" ? "d" : "a";
   else cursor = { x, y, dir: cursor.dir };
 }
 
@@ -170020,14 +170028,24 @@ document.addEventListener("keydown", e => {
   if (!$("help").hidden || !$("over").hidden) return;
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   const k = e.key;
-  if (/^[a-zA-Z]$/.test(k)){ sel.clear(); typeLetter(k.toLowerCase()); paint(); syncSoon(); e.preventDefault(); return; }
-  if (k === "Backspace" || k === "Delete"){ backspace(); paint(); syncSoon(); e.preventDefault(); return; }
-  if (k === " "){ cursor.dir = cursor.dir === "a" ? "d" : "a"; sigs.fill(""); paint(); e.preventDefault(); return; }
-  if (k === "Escape"){ sel.clear(); picked = null; sigs.fill(""); paint(); return; }
+  if (/^[a-zA-Z]$/.test(k)){
+    if (!typing){ typing = true; sigs.fill(""); }
+    sel.clear(); typeLetter(k.toLowerCase()); paint(); syncSoon(); e.preventDefault(); return;
+  }
+  if (k === "Escape"){ typing = false; sel.clear(); picked = null; sigs.fill(""); paint(); return; }
+  if (k === "Backspace" || k === "Delete"){
+    if (!typing) return;
+    backspace(); paint(); syncSoon(); e.preventDefault(); return;
+  }
+  if (k === " "){
+    if (!typing) return;
+    cursor.dir = cursor.dir === "a" ? "d" : "a"; sigs.fill(""); paint(); e.preventDefault(); return;
+  }
   const mv = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[k];
   if (mv){
     if (sel.size){ if (moveSelection(mv[0], mv[1])) syncSoon(); }
-    else { cursor.x = clamp(cursor.x + mv[0]); cursor.y = clamp(cursor.y + mv[1]); cursor.dir = mv[0] ? "a" : "d"; }
+    else if (typing){ cursor.x = clamp(cursor.x + mv[0]); cursor.y = clamp(cursor.y + mv[1]); cursor.dir = mv[0] ? "a" : "d"; }
+    else return;
     paint();
     e.preventDefault();
   }
