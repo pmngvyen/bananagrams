@@ -205,9 +205,10 @@ ul.seats .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   max-width:calc(100% - 60px);overflow:hidden;text-overflow:ellipsis}
 .note.warn{border-color:var(--rust);color:var(--rust)}
 
-#ghost{position:fixed;z-index:80;pointer-events:none;
+#ghost{display:none;position:fixed;z-index:80;pointer-events:none;
   width:var(--cell);height:var(--cell);font-size:calc(var(--cell) * .5);
   border-bottom-width:6px;transform:translate(-50%,-50%)}
+#ghost.carrying{display:grid}
 
 /* ---------- the one piece of motion ---------- */
 #stamp{position:fixed;inset:0;display:grid;place-items:center;z-index:75;pointer-events:none}
@@ -386,7 +387,7 @@ ul.seats .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 </div>
 
-<div id="ghost" class="tile" hidden></div>
+<div id="ghost" class="tile"></div>
 <div id="stamp"><span></span></div>
 
 <!-- ================= rules ================= -->
@@ -169214,7 +169215,7 @@ let cells = [], sigs = [], drag = null;
 let zoom = 38, soundOn = true, view = "", audio = null;
 let myPeels = 0, myDumps = 0, mode = "full";
 let dealt = false, lastN = 0, peelTimer = null, flash = {}, starting = false, dropCell = null;
-let typing = false;   /* the keyboard cursor stays out of sight until you actually type */
+let typing = false, rackSig = "";   /* the keyboard cursor stays out of sight until you actually type */
 
 const K = (x, y) => x + "," + y;
 const parseK = k => k.split(",").map(Number);
@@ -169370,7 +169371,7 @@ function paint(){
   for (let i = 0; i < cells.length; i++){
     const el = cells[i], k = el.dataset.k, t = grid.get(k);
     const cur = typing && !t && k === ck, curT = typing && t && k === ck;
-    const g = an.good.has(k), off = an.loose.has(k), s = sel.has(k);
+    const g = an.good.has(k), off = an.loose.has(k) && !hand.length, s = sel.has(k);
     const sig = (t ? t.l + t.id : "-") + (cur || curT ? "c" + cursor.dir : "") +
                 (g ? "g" : "") + (off ? "o" : "") + (s ? "s" : "");
     if (sigs[i] === sig) continue;
@@ -169384,9 +169385,15 @@ function paint(){
     } else if (el.firstChild) el.innerHTML = "";
   }
 
-  rackEl.innerHTML = hand.length
-    ? hand.map(t => '<div class="tile' + (picked === t.id ? " picked" : "") + '" data-id="' + t.id + '">' + t.l.toUpperCase() + "</div>").join("")
-    : '<span class="empty">Hand empty</span>';
+  const rs = hand.map(t => t.id + t.l).join(",") + "|" + picked;
+  if (rs !== rackSig && !(drag && drag.on && drag.src === "rack")){
+    const sl = rackEl.scrollLeft;
+    rackEl.innerHTML = hand.length
+      ? hand.map(t => '<div class="tile' + (picked === t.id ? " picked" : "") + '" data-id="' + t.id + '">' + t.l.toUpperCase() + "</div>").join("")
+      : '<span class="empty">Hand empty</span>';
+    rackEl.scrollLeft = sl;
+    rackSig = rs;
+  }
 
   const bunch = (pool && pool.bunch) || "";
   $("bunchCount").textContent = bunch.length;
@@ -169851,16 +169858,23 @@ function leave(msg){
    POINTER
    ================================================================== */
 function geom(){
-  const cs = getComputedStyle(board);
-  return { pad: parseFloat(cs.paddingLeft) || 0, size: zoom + GAP, rect: board.getBoundingClientRect() };
+  const r0 = cells[0].getBoundingClientRect();
+  return { x0: r0.left, y0: r0.top, w: r0.width, size: r0.width + GAP,
+           rect: board.getBoundingClientRect() };
 }
+/* nearest square to a point. Measuring off a real cell keeps this honest at any
+   zoom, and rounding means the gaps between squares are not dead ground. */
 function cellFromPoint(cx, cy, g){
-  return { x: Math.floor((cx - g.rect.left - g.pad) / g.size),
-           y: Math.floor((cy - g.rect.top - g.pad) / g.size) };
+  g = g || geom();
+  return { x: Math.round((cx - g.x0 - g.w / 2) / g.size),
+           y: Math.round((cy - g.y0 - g.w / 2) / g.size) };
 }
-function cellUnder(x, y){
-  const el = document.elementFromPoint(x, y);
-  return el && el.closest ? el.closest(".cell") : null;
+function cellUnder(cx, cy){
+  const b = boardwrap.getBoundingClientRect();
+  if (cx < b.left || cx > b.right || cy < b.top || cy > b.bottom) return null;
+  const p = cellFromPoint(cx, cy);
+  if (p.x < 0 || p.y < 0 || p.x >= GRID || p.y >= GRID) return null;
+  return board.querySelector('[data-k="' + K(p.x, p.y) + '"]');
 }
 function overPouch(x, y){
   const el = document.elementFromPoint(x, y);
@@ -169883,7 +169897,7 @@ function onMove(e){
     drag.on = true;
     if (drag.group) startCarry();
     else if (drag.tile){
-      ghost.hidden = false;
+      ghost.classList.add("carrying");
       ghost.textContent = drag.tile.l.toUpperCase();
       const el = drag.fromK ? board.querySelector('[data-k="' + drag.fromK + '"] .tile')
                             : rackEl.querySelector('[data-id="' + drag.tile.id + '"]');
@@ -169947,7 +169961,7 @@ function onUp(e){
   window.removeEventListener("pointercancel", onUp);
   const d = drag;
   drag = null;
-  ghost.hidden = true;
+  ghost.classList.remove("carrying");
   marquee.classList.add("hide");
   pouch.classList.remove("live");
   if (dropCell){ dropCell.classList.remove("drop"); dropCell = null; }
@@ -170000,6 +170014,7 @@ board.addEventListener("pointerdown", e => {
   const c = e.target.closest(".cell");
   if (!c) return;
   const k = c.dataset.k, t = grid.get(k);
+  if (sel.size && !(t && sel.has(k))){ sel.clear(); sigs.fill(""); paint(); }
   beginDrag(e, "grid", t || null, t ? k : null, k);
   if (t && sel.has(k)) drag.group = true;
 });
