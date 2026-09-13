@@ -40,6 +40,7 @@ button,input{font:inherit;color:inherit}
 button{background:none;border:none;cursor:pointer}
 :focus-visible{outline:3px solid var(--edge2);outline-offset:2px}
 .hide{display:none !important}
+#app{display:flex;flex-direction:column;height:100dvh;overflow:hidden}
 
 /* ---------- tiles: a printed card with a solid lip, never a shadow ---------- */
 .tile{
@@ -98,6 +99,7 @@ input.code{font-family:var(--slab);font-size:29px;letter-spacing:.3em;text-align
 .btn.full{width:100%;text-align:center}
 .row{display:flex;gap:10px;flex-wrap:wrap}
 .err{color:var(--rust);font-size:13.5px;font-weight:600;min-height:19px;margin-top:10px}
+.err.info{color:var(--dim)}
 
 .modes{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media (max-width:600px){.modes{grid-template-columns:1fr}}
@@ -169,38 +171,40 @@ ul.seats .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hud li .n{font-family:var(--slab);font-size:14px}
 .hud li.clear .n{color:var(--rust)}
 
-/* ---------- the dump pouch ---------- */
-.pouch{position:absolute;right:16px;bottom:16px;z-index:8;width:104px;height:88px;
-  display:grid;place-items:center;padding:0;
-  background:#4E3D24;border:3px solid var(--edge2);border-radius:6px 6px 40px 40px}
-.pouch svg{width:44px;height:44px;display:block}
-.pouch .lbl{font-size:9.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
-  color:#C7B48C;margin-top:3px}
+/* ---------- your tray: hand, tools, dump, status ---------- */
+.tray{position:absolute;right:14px;top:14px;z-index:8;width:296px;
+  background:var(--panel);border:2px solid var(--edge2);border-radius:5px;overflow:hidden}
+.trayhead{background:var(--yellow);border-bottom:2px solid var(--edge2);
+  padding:5px 6px 5px 11px;display:flex;align-items:center;gap:6px}
+.trayhead .ttl{flex:1;font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.62}
+.tools{display:flex;gap:3px}
+.icon{width:26px;height:26px;padding:0;display:grid;place-items:center;font-size:13px;
+  border-width:1.5px;border-radius:3px}
+.icon:hover:not(:disabled){background:rgba(107,86,54,.18)}
+#rack{display:flex;flex-wrap:wrap;gap:5px;padding:10px;min-height:58px;align-content:flex-start}
+#rack .tile{width:38px;height:38px;font-size:19px;cursor:grab}
+#rack .tile.picked{background:var(--yellow);border-color:var(--gold)}
+#rack .tile.lifted{opacity:.28}
+#rack .empty{color:var(--dimmer);font-size:12.5px;font-weight:600;align-self:center;padding:6px}
+
+.note{padding:7px 11px;font-size:12px;font-weight:600;line-height:1.35;
+  border-top:2px solid var(--edge2);background:#FFF7DE}
+.note.warn{background:#FAE6E0;color:var(--rust)}
+
+.pouch{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+  padding:9px 11px;background:#4E3D24;border:0;border-top:2px solid var(--edge2);border-radius:0}
+.pouch svg{width:26px;height:26px;flex:0 0 auto;display:block}
+.pouch .lbl{font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#C7B48C}
 .pouch.live{background:var(--yellow)}
 .pouch.live svg path{fill:var(--ink)}
 .pouch.live svg path+path{fill:#6B5636}
 .pouch.live .lbl{color:var(--ink)}
-.pouch.cold{opacity:.45}
+.pouch.cold{opacity:.5}
 
-.note{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:8;
-  background:var(--panel);border:2px solid var(--edge2);border-radius:4px;
-  padding:7px 14px;font-size:13px;font-weight:600;white-space:nowrap;
-  max-width:calc(100% - 260px);overflow:hidden;text-overflow:ellipsis}
-.note.warn{border-color:var(--rust);color:var(--rust)}
-
-/* ---------- rack ---------- */
-.dock{flex:0 0 auto;border-top:3px solid var(--edge2);background:var(--panel);
-  padding:11px 14px calc(11px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:12px}
-#rack{flex:1;min-width:0;display:flex;gap:6px;flex-wrap:wrap;align-content:center;min-height:46px}
-#rack .tile{width:44px;height:44px;font-size:22px;cursor:grab}
-#rack .tile.picked{background:var(--yellow);border-color:var(--gold)}
-#rack .tile.lifted{opacity:.3}
-#rack .empty{color:var(--dimmer);font-size:13px;align-self:center;font-weight:600}
-.tools{display:flex;gap:7px;flex:0 0 auto}
-.icon{width:36px;height:36px;padding:0;display:grid;place-items:center;font-size:16px}
-
-#ghost{position:fixed;z-index:80;pointer-events:none;width:44px;height:44px;font-size:22px;
-  transform:translate(-50%,-50%) rotate(-5deg)}
+#ghost{position:fixed;z-index:80;pointer-events:none;width:38px;height:38px;font-size:19px;
+  transform:translate(-50%,-50%) rotate(-5deg);transition:width .07s,height .07s,font-size .07s}
+#ghost.snap{width:var(--cell);height:var(--cell);font-size:calc(var(--cell) * .5);
+  transform:translate(-50%,-50%) rotate(0deg)}
 
 /* ---------- the one piece of motion ---------- */
 #stamp{position:fixed;inset:0;display:grid;place-items:center;z-index:75;pointer-events:none}
@@ -249,16 +253,13 @@ ul.seats .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .bar{height:46px;gap:10px;padding:0 11px}
   .wordmark{font-size:16px}
   .wordmark svg{width:22px;height:22px}
-  .hud{left:9px;top:9px;width:140px}
+  .hud{left:9px;top:9px;width:132px}
   .hud .top b{font-size:18px}
-  .hud ul{max-height:24vh}
-  .pouch{right:10px;bottom:10px;width:78px;height:68px}
-  .pouch svg{width:32px;height:32px}
-  .note{bottom:9px;max-width:calc(100% - 200px);font-size:12px;padding:6px 10px}
-  .dock{gap:9px;padding:9px 10px calc(9px + env(safe-area-inset-bottom));flex-wrap:wrap}
-  #rack{order:1;flex:1 0 100%;justify-content:center}
-  #rack .tile{width:38px;height:38px;font-size:19px}
-  .tools{order:2;flex:1 0 100%;justify-content:center}
+  .hud ul{max-height:20vh}
+  .tray{right:8px;left:8px;top:auto;bottom:8px;width:auto}
+  #rack{justify-content:center;padding:8px;min-height:50px}
+  #rack .tile{width:34px;height:34px;font-size:17px}
+  #ghost{width:34px;height:34px;font-size:17px}
   .card{padding:20px}
 }
 </style>
@@ -336,10 +337,10 @@ ul.seats .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
             <span class="d" id="dShort">A smaller bunch</span>
           </button>
         </div>
-        <button class="btn go full" id="splitBtn" style="margin-top:20px">Split</button>
-        <div class="err" id="lobbyErr"></div>
       </div>
-      <p id="waitNote" class="hide" style="margin:20px 0 0;text-align:center;color:var(--dim)">Waiting for the host to deal.</p>
+      <button class="btn go full" id="splitBtn" style="margin-top:20px">Split</button>
+      <div class="err" id="lobbyErr"></div>
+      <p id="waitNote" class="hide" style="margin:14px 0 0;text-align:center;color:var(--dimmer);font-size:13px">The host picks the length. Everyone has to hit Split.</p>
     </div>
   </section>
 
@@ -354,29 +355,30 @@ ul.seats .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       <ul id="tally"></ul>
     </div>
 
-    <button class="pouch" id="pouch" title="Drag a tile here to swap it for three">
-      <div>
+    <div class="tray" id="tray">
+      <div class="trayhead">
+        <span class="ttl">Your tiles</span>
+        <div class="tools">
+          <button class="btn icon" id="shuffleBtn" title="Shuffle" aria-label="Shuffle your tiles">&#8646;</button>
+          <button class="btn icon" id="recallBtn" title="Take every tile back" aria-label="Take every tile back">&#8634;</button>
+          <button class="btn icon" id="zoomOut" title="Zoom out" aria-label="Zoom out">&minus;</button>
+          <button class="btn icon" id="zoomIn" title="Zoom in" aria-label="Zoom in">+</button>
+          <button class="btn icon" id="soundBtn" title="Sound" aria-label="Toggle sound">&#9834;</button>
+        </div>
+      </div>
+      <div id="rack"></div>
+      <div class="note hide" id="note"></div>
+      <button class="pouch" id="pouch" title="Drop a tile here to swap it for three">
         <svg viewBox="0 0 40 40" aria-hidden="true">
           <path d="M8 6c-2 0-3 1.3-2.7 3 .4 2.3 1.3 4.1 1.3 6.9C6.6 25.5 14 33.5 24 33.5c5.6 0 10-2.2 12.2-5.1 1-1.2.2-2.6-1.2-2.4-7.8.7-13.7-1.9-17.5-6.6-3.2-4-4.2-7.7-4.8-11.1C12.4 6.6 11.1 6 8 6Z" fill="#FFC72C"/>
           <path d="M24 33.5c5.6 0 10-2.2 12.2-5.1 1-1.2.2-2.6-1.2-2.4-1.6.2-3.1.2-4.5 0-1.4 3.8-4.5 6.5-8.8 7.4.8.1 1.6.1 2.3.1Z" fill="#C89200"/>
         </svg>
-        <div class="lbl">Dump</div>
-      </div>
-    </button>
+        <span class="lbl">Drop a tile to swap it for three</span>
+      </button>
+    </div>
 
-    <div class="note hide" id="note"></div>
   </main>
 
-  <footer class="dock hide" id="dock">
-    <div id="rack"></div>
-    <div class="tools">
-      <button class="btn icon" id="zoomOut" title="Zoom out" aria-label="Zoom out">&minus;</button>
-      <button class="btn icon" id="zoomIn" title="Zoom in" aria-label="Zoom in">+</button>
-      <button class="btn icon" id="shuffleBtn" title="Shuffle your tiles" aria-label="Shuffle your tiles">&#8646;</button>
-      <button class="btn icon" id="soundBtn" title="Sound" aria-label="Toggle sound">&#9834;</button>
-      <button class="btn icon" id="recallBtn" title="Take every tile back" aria-label="Take every tile back">&#8634;</button>
-    </div>
-  </footer>
 </div>
 
 <div id="ghost" class="tile" hidden></div>
@@ -169206,7 +169208,7 @@ let picked = null, sel = new Set(), busy = false;
 let cells = [], sigs = [], drag = null;
 let zoom = 38, soundOn = true, view = "", audio = null;
 let myPeels = 0, myDumps = 0, mode = "full";
-let dealt = false, lastN = 0, peelTimer = null, flash = {};
+let dealt = false, lastN = 0, peelTimer = null, flash = {}, starting = false, dropCell = null;
 
 const K = (x, y) => x + "," + y;
 const parseK = k => k.split(",").map(Number);
@@ -169416,7 +169418,6 @@ function paintNote(an){
 function show(v){
   view = v;
   ["v-config", "v-home", "v-lobby", "v-play"].forEach(id => $(id).classList.toggle("hide", id !== "v-" + v));
-  $("dock").classList.toggle("hide", v !== "play");
   $("roomTag").classList.toggle("hide", !code);
   $("leaveBtn").classList.toggle("hide", !code);
   if (v === "play") requestAnimationFrame(() => { sigs.fill(""); paint(); });
@@ -169602,7 +169603,9 @@ function paintLobby(){
     "<li><span class='nm'>" + esc(seats[p].name) + "</span>" +
     (p === me ? "<span class='pill grey'>you</span>" : "") +
     (p === meta.host ? "<span class='pill'>host</span>" : "") +
-    (seats[p].online === false ? "<span class='pill off'>away</span>" : "") + "</li>").join("");
+    (seats[p].online === false ? "<span class='pill off'>away</span>"
+      : seats[p].ready ? "<span class='pill'>ready</span>"
+      : "<span class='pill grey'>not ready</span>") + "</li>").join("");
 
   const host = isHost();
   $("hostBox").classList.toggle("hide", !host);
@@ -169620,12 +169623,27 @@ function paintLobby(){
     $("dFull").textContent = "All 144 tiles";
     $("dShort").textContent = "A smaller bunch";
   }
-  $("splitBtn").disabled = n < 2;
-  $("lobbyErr").textContent = n < 2 ? "Waiting for at least one more player." : "";
+
+  const iam = !!(seats[me] && seats[me].ready);
+  const readyN = live.filter(p => seats[p].ready).length;
+  const btn = $("splitBtn");
+  btn.textContent = iam ? "Ready — tap to take it back" : "Split";
+  btn.className = "btn full" + (iam ? "" : " go");
+  btn.disabled = n < 2;
+  const err = $("lobbyErr");
+  if (n < 2){ err.className = "err"; err.textContent = "Waiting for at least one more player."; }
+  else if (readyN < n){ err.className = "err info"; err.textContent = readyN + " of " + n + " ready"; }
+  else { err.className = "err info"; err.textContent = "Everyone is in. Dealing…"; }
+
+  /* one person deals, and only once everybody has hit split */
+  if (host && meta.phase === "lobby" && n >= 2 && readyN === n && !starting){
+    starting = true;
+    Promise.resolve(startGame()).finally(() => { starting = false; });
+  }
 }
 
 async function startGame(){
-  if (!isHost()) return;
+  if (!isHost() || !meta || meta.phase !== "lobby") return;
   const ids = Object.keys(seats).filter(p => seats[p].online !== false)
     .sort((a, b) => (seats[a].joined || 0) - (seats[b].joined || 0));
   if (ids.length < 2) return;
@@ -169635,7 +169653,7 @@ async function startGame(){
   ids.forEach(p => {
     boards[p] = { hand: b.slice(0, start), grid: null, took: 0 };
     b = b.slice(start);
-    seatUp[p] = Object.assign({}, seats[p], { tiles: start, peels: 0, dumps: 0 });
+    seatUp[p] = Object.assign({}, seats[p], { tiles: start, peels: 0, dumps: 0, ready: false });
   });
   await update(ref(db, "rooms/" + code), {
     "meta/phase": "play", "meta/startedAt": serverTimestamp(), "meta/start": start,
@@ -169795,6 +169813,7 @@ async function backToLobby(){
     reset["seats/" + p + "/tiles"] = 0;
     reset["seats/" + p + "/peels"] = 0;
     reset["seats/" + p + "/dumps"] = 0;
+    reset["seats/" + p + "/ready"] = false;
   });
   await update(ref(db, "rooms/" + code), Object.assign(reset,
     { "meta/phase": "lobby", pool: null, boards: null, winner: null }));
@@ -169870,13 +169889,22 @@ function onMove(e){
   }
   if (drag.group){ moveCarry(e); return; }
 
-  ghost.style.left = e.clientX + "px";
-  ghost.style.top = e.clientY + "px";
   const over = overPouch(e.clientX, e.clientY);
   pouch.classList.toggle("live", over && !pouch.classList.contains("cold"));
   const c = over ? null : cellUnder(e.clientX, e.clientY);
-  cells.forEach(x => x.classList.remove("drop"));
-  if (c) c.classList.add("drop");
+  if (dropCell && dropCell !== c) dropCell.classList.remove("drop");
+  dropCell = c;
+  if (c){
+    c.classList.add("drop");
+    const r = c.getBoundingClientRect();
+    ghost.style.left = (r.left + r.width / 2) + "px";
+    ghost.style.top = (r.top + r.height / 2) + "px";
+    ghost.classList.add("snap");
+  } else {
+    ghost.style.left = e.clientX + "px";
+    ghost.style.top = e.clientY + "px";
+    ghost.classList.remove("snap");
+  }
 }
 
 function startCarry(){
@@ -169910,9 +169938,10 @@ function onUp(e){
   const d = drag;
   drag = null;
   ghost.hidden = true;
+  ghost.classList.remove("snap");
   marquee.classList.add("hide");
   pouch.classList.remove("live");
-  cells.forEach(x => x.classList.remove("drop"));
+  if (dropCell){ dropCell.classList.remove("drop"); dropCell = null; }
   rackEl.querySelectorAll(".lifted").forEach(x => x.classList.remove("lifted"));
   if (!d) return;
 
@@ -170036,7 +170065,10 @@ $("optMode").addEventListener("click", e => {
   mode = b.dataset.v;
   update(R.meta, { mode });
 });
-$("splitBtn").onclick = () => startGame();
+$("splitBtn").onclick = () => {
+  if (!code || !seats[me]) return;
+  update(R.mySeat, { ready: !seats[me].ready });
+};
 $("shuffleBtn").onclick = () => {
   for (let i = hand.length - 1; i > 0; i--){
     const j = Math.floor(Math.random() * (i + 1));
