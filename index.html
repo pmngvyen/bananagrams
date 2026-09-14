@@ -169327,8 +169327,7 @@ function analyse(g){
            ok: g.size > 0 && !lone && connected && !wrong.length };
 }
 
-function sortHand(){ hand.sort((a, b) => a.l < b.l ? -1 : a.l > b.l ? 1 : 0); }
-function toHand(t){ hand.push(t); sortHand(); }
+function toHand(t){ hand.push(t); }   /* tiles always join on the right */
 function cursorK(){ return K(cursor.x, cursor.y); }
 function clamp(v){ return Math.max(0, Math.min(GRID - 1, v)); }
 function step(n){
@@ -169367,7 +169366,6 @@ function recall(){
   for (const t of grid.values()) hand.push(t);
   grid.clear();
   sel.clear();
-  sortHand();
   sigs.fill("");
   paint();
   syncSoon();
@@ -169636,7 +169634,6 @@ function onPool(){
   if (owed){
     const added = [];
     for (const ch of owed){ const nt = tile(ch); hand.push(nt); added.push(nt.id); }
-    sortHand();
     markNew(added);
     took = pool.n;
     syncNow();
@@ -169721,12 +169718,10 @@ async function restoreBoard(){
   const g = v.grid || {};
   for (const k in g) grid.set(k.replace("_", ","), tile(g[k]));
   took = v.took || 0;
-  sortHand();
   sigs.fill("");
   const owed = owedTo(pool, me, took);
   if (owed){
     for (const ch of owed){ const nt = tile(ch); hand.push(nt); opening.push(nt.id); }
-    sortHand();
     took = pool.n;
     syncNow();
   }
@@ -169802,7 +169797,6 @@ async function doDump(t){
     if (take){
       const added = [];
       for (const ch of take){ const nt = tile(ch); hand.push(nt); added.push(nt.id); }
-      sortHand();
       markNew(added);
       myDumps++;
       syncNow();
