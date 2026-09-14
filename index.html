@@ -171,10 +171,10 @@ ul.seats .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hud li .n{font-family:var(--slab);font-size:14px}
 .hud li.clear .n{color:var(--rust)}
 
-/* ---------- your tray: one row of tiles, tools, dump ---------- */
-.tray{flex:0 0 auto;display:flex;align-items:center;gap:10px;
+/* ---------- your tiles: one centred row under the bar ---------- */
+.tray{flex:0 0 auto;display:flex;justify-content:center;align-items:center;
   background:var(--panel);border-bottom:3px solid var(--edge2);padding:8px 12px}
-#rack{flex:1;min-width:0;display:flex;flex-wrap:nowrap;gap:5px;align-items:center;
+#rack{flex:0 1 auto;max-width:100%;display:flex;flex-wrap:nowrap;gap:5px;align-items:center;
   overflow-x:auto;overflow-y:hidden;min-height:42px;padding-bottom:2px;
   scrollbar-width:thin;scrollbar-color:var(--edge) transparent}
 #rack::-webkit-scrollbar{height:7px}
@@ -184,13 +184,12 @@ ul.seats .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #rack .tile.lifted{opacity:.28}
 .cell .tile.lifted{opacity:.2}
 #rack .empty{color:var(--dimmer);font-size:12.5px;font-weight:600;white-space:nowrap}
-.tools{display:flex;gap:4px;flex:0 0 auto}
-.icon{width:30px;height:30px;padding:0;display:grid;place-items:center;font-size:14px;
-  border-width:1.5px;border-radius:3px}
-.icon:hover:not(:disabled){background:rgba(107,86,54,.14)}
 
-.pouch{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:7px 13px 7px 10px;
-  background:#4E3D24;border:2px solid var(--edge2);border-radius:4px}
+/* ---------- dump and controls, facing the tally across the board ---------- */
+.kit{position:absolute;right:14px;top:14px;z-index:8;
+  background:var(--panel);border:2px solid var(--edge2);border-radius:5px;overflow:hidden}
+.pouch{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  padding:9px 16px;background:#4E3D24;border:0;border-bottom:2px solid var(--edge2);border-radius:0}
 .pouch svg{width:26px;height:26px;display:block}
 .pouch .lbl{font-family:var(--slab);font-size:14px;letter-spacing:.04em;color:var(--yellow)}
 .pouch.live{background:var(--yellow)}
@@ -198,6 +197,10 @@ ul.seats .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pouch.live svg path+path{fill:#6B5636}
 .pouch.live .lbl{color:var(--ink)}
 .pouch.cold{opacity:.45}
+.tools{display:flex;gap:4px;padding:6px;justify-content:center}
+.icon{width:30px;height:30px;padding:0;display:grid;place-items:center;font-size:14px;
+  border-width:1.5px;border-radius:3px}
+.icon:hover:not(:disabled){background:rgba(107,86,54,.14)}
 
 .note{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:8;
   background:var(--panel);border:2px solid var(--edge2);border-radius:4px;
@@ -355,20 +358,6 @@ ul.seats .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   <!-- ================= play ================= -->
   <div class="tray hide" id="tray">
     <div id="rack"></div>
-    <div class="tools">
-      <button class="btn icon" id="shuffleBtn" title="Shuffle" aria-label="Shuffle your tiles">&#8646;</button>
-      <button class="btn icon" id="recallBtn" title="Take every tile back" aria-label="Take every tile back">&#8634;</button>
-      <button class="btn icon" id="zoomOut" title="Zoom out" aria-label="Zoom out">&minus;</button>
-      <button class="btn icon" id="zoomIn" title="Zoom in" aria-label="Zoom in">+</button>
-      <button class="btn icon" id="soundBtn" title="Sound" aria-label="Toggle sound">&#9834;</button>
-    </div>
-    <button class="pouch" id="pouch" title="Drop a tile here to swap it for three">
-      <svg viewBox="0 0 40 40" aria-hidden="true">
-        <path d="M8 6c-2 0-3 1.3-2.7 3 .4 2.3 1.3 4.1 1.3 6.9C6.6 25.5 14 33.5 24 33.5c5.6 0 10-2.2 12.2-5.1 1-1.2.2-2.6-1.2-2.4-7.8.7-13.7-1.9-17.5-6.6-3.2-4-4.2-7.7-4.8-11.1C12.4 6.6 11.1 6 8 6Z" fill="#FFC72C"/>
-        <path d="M24 33.5c5.6 0 10-2.2 12.2-5.1 1-1.2.2-2.6-1.2-2.4-1.6.2-3.1.2-4.5 0-1.4 3.8-4.5 6.5-8.8 7.4.8.1 1.6.1 2.3.1Z" fill="#C89200"/>
-      </svg>
-      <span class="lbl">Dump</span>
-    </button>
   </div>
 
   <main class="play hide" id="v-play">
@@ -379,6 +368,23 @@ ul.seats .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     <div class="hud">
       <div class="top"><b id="bunchCount">0</b><span>left in bunch</span></div>
       <ul id="tally"></ul>
+    </div>
+
+    <div class="kit">
+      <button class="pouch" id="pouch" title="Drop a tile here to swap it for three">
+        <svg viewBox="0 0 40 40" aria-hidden="true">
+          <path d="M8 6c-2 0-3 1.3-2.7 3 .4 2.3 1.3 4.1 1.3 6.9C6.6 25.5 14 33.5 24 33.5c5.6 0 10-2.2 12.2-5.1 1-1.2.2-2.6-1.2-2.4-7.8.7-13.7-1.9-17.5-6.6-3.2-4-4.2-7.7-4.8-11.1C12.4 6.6 11.1 6 8 6Z" fill="#FFC72C"/>
+          <path d="M24 33.5c5.6 0 10-2.2 12.2-5.1 1-1.2.2-2.6-1.2-2.4-1.6.2-3.1.2-4.5 0-1.4 3.8-4.5 6.5-8.8 7.4.8.1 1.6.1 2.3.1Z" fill="#C89200"/>
+        </svg>
+        <span class="lbl">Dump</span>
+      </button>
+      <div class="tools">
+        <button class="btn icon" id="shuffleBtn" title="Shuffle" aria-label="Shuffle your tiles">&#8646;</button>
+        <button class="btn icon" id="recallBtn" title="Take every tile back" aria-label="Take every tile back">&#8634;</button>
+        <button class="btn icon" id="zoomOut" title="Zoom out" aria-label="Zoom out">&minus;</button>
+        <button class="btn icon" id="zoomIn" title="Zoom in" aria-label="Zoom in">+</button>
+        <button class="btn icon" id="soundBtn" title="Sound" aria-label="Toggle sound">&#9834;</button>
+      </div>
     </div>
 
     <div class="note hide" id="note"></div>
