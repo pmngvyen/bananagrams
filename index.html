@@ -183,13 +183,14 @@ ul.seats .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #rack .tile.picked{background:var(--yellow);border-color:var(--gold)}
 #rack .tile.lifted{opacity:.28}
 /* arriving tiles give a quick shake so you can see what landed */
-#rack .tile.new{animation:jiggle .46s ease-out}
+#rack .tile.new{animation:jiggle .82s ease-out}
 @keyframes jiggle{
-  0%{transform:translateY(-5px) rotate(0deg)}
-  22%{transform:translateY(0) rotate(-6deg)}
-  44%{transform:rotate(4.5deg)}
-  62%{transform:rotate(-3deg)}
-  80%{transform:rotate(1.5deg)}
+  0%{transform:translateY(-6px) rotate(0deg)}
+  16%{transform:translateY(0) rotate(-6deg)}
+  34%{transform:rotate(5deg)}
+  51%{transform:rotate(-3.5deg)}
+  68%{transform:rotate(2.2deg)}
+  84%{transform:rotate(-1.2deg)}
   100%{transform:rotate(0deg)}
 }
 #rack .empty{color:var(--dimmer);font-size:12.5px;font-weight:600;white-space:nowrap}
@@ -169244,7 +169245,7 @@ function markNew(ids){
     ids.forEach(i => freshHand.delete(i));
     rackSig = "";
     paint();
-  }, 1500);
+  }, 2400);
 }   /* the keyboard cursor stays out of sight until you actually type */
 
 const K = (x, y) => x + "," + y;
